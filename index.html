@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Idee Geniali — Bacheca community in tempo reale per condividere idee e scambiare soluzioni.">
+    <meta name="theme-color" content="#0a0f1a">
+    <title>Idee Geniali</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0f1a;
+            --bg-elevated: #111827;
+            --surface: #1a2332;
+            --surface-hover: #243044;
+            --primary: #3b82f6;
+            --primary-2: #8b5cf6;
+            --accent: #06b6d4;
+            --gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+            --gradient-soft: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+            --text-bright: #FFFFFF;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.45);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --sidebar-w: 340px;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+            --glow: 0 0 60px rgba(59, 130, 246, 0.12);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Sfondo animato premium */
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59, 130, 246, 0.18), transparent),
+                radial-gradient(ellipse 60% 40% at 90% 10%, rgba(139, 92, 246, 0.14), transparent),
+                radial-gradient(ellipse 50% 30% at 50% 100%, rgba(6, 182, 212, 0.08), transparent);
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+        }
+
+        #app-content {
+            position: relative;
+            z-index: 1;
+            transition: margin 0.45s cubic-bezier(0.4, 0, 0.2, 1), width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 2rem 4rem;
+            min-height: 100vh;
+        }
+
+        body.left-open #app-content {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w));
+        }
+
+        body.right-open #app-content {
+            margin-right: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w));
+        }
+
+        body.left-open.right-open #app-content {
+            margin-left: var(--sidebar-w);
+            margin-right: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w) * 2);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+            width: 100%;
+            max-width: 860px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            background: var(--gradient-soft);
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            letter-spacing: 0.03em;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 6vw, 3.75rem);
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.03em;
+            animation: fadeInDown 0.7s ease-out 0.05s both;
+        }
+
+        p.subtitle {
+            color: var(--text-bright);
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-weight: 400;
+            max-width: 560px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        /* Statistiche */
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.75rem;
+            animation: fadeIn 0.9s ease-out 0.35s both;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-pill strong {
+            color: var(--text-bright);
+            font-weight: 700;
+        }
+
+        main {
+            width: 100%;
+            max-width: 860px;
+        }
+
+        /* Form idea */
+        .idea-form {
+            background: linear-gradient(145deg, rgba(26, 35, 50, 0.95), rgba(17, 24, 39, 0.9));
+            padding: 1.75rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow), var(--glow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            animation: slideUp 0.7s ease-out 0.15s both;
+            position: sticky;
+            top: 1rem;
+            z-index: 10;
+            backdrop-filter: blur(16px);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row:last-child { margin-bottom: 0; }
+
+        .form-row.inline {
+            flex-direction: row;
+            align-items: stretch;
+            gap: 0.75rem;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="search"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.95rem 1.25rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 88px;
+            line-height: 1.5;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary-2);
+            background: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.75;
+        }
+
+        .char-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        .char-hint.warn { color: var(--warning); }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            font-weight: 600;
+            font-family: inherit;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            padding: 0.95rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 1.05rem;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            width: 100%;
+            font-size: 0.95rem;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Toolbar ricerca/ordine */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.8s ease-out 0.25s both;
+        }
+
+        .toolbar .search-wrap {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .toolbar .search-wrap::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .toolbar input[type="search"] {
+            padding-left: 2.6rem;
+        }
+
+        .toolbar select {
+            min-width: 180px;
+            cursor: pointer;
+        }
+
+        /* Cards idee */
+        .ideas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding-bottom: 3rem;
+        }
+
+        .idea-card {
+            background: linear-gradient(160deg, rgba(26, 35, 50, 0.75), rgba(17, 24, 39, 0.6));
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            animation: cardIn 0.45s ease-out forwards;
+            opacity: 0;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            border-color: var(--border-hover);
+        }
+
+        .idea-card.top-idea {
+            border-color: rgba(245, 158, 11, 0.35);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.08);
+        }
+
+        .idea-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .author-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .author-info {
+            min-width: 0;
+        }
+
+        .author-name {
+            font-weight: 700;
+            color: var(--text-bright);
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .idea-text {
+            font-size: 1.15rem;
+            font-weight: 500;
+            line-height: 1.55;
+            color: var(--text-main);
+            margin-top: 0.25rem;
+            word-break: break-word;
+        }
+
+        .top-badge {
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.3rem 0.65rem;
+            border-radius: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .idea-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.65rem 0.85rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .vote-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .vote-btn {
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vote-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-bright);
+        }
+
+        .vote-btn.upvote:hover {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.12);
+        }
+
+        .vote-btn.downvote:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .vote-count {
+            font-size: 1.15rem;
+            font-weight: 800;
+            min-width: 28px;
+            text-align: center;
+            color: var(--text-bright);
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: 8px;
+            display: none;
+            border: 1px solid transparent;
+        }
+
+        body.admin-mode .delete-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        .comments-section {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .comments-header {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+
+        .comment {
+            background: rgba(0, 0, 0, 0.22);
+            padding: 0.9rem 1rem;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--primary);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .comment-author {
+            font-weight: 700;
+            color: var(--text-bright);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .comment-text {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .comment-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .comment-form .row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .comment-form .row input { flex: 1; min-width: 120px; }
+
+        .timestamp {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Sidebars */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        body.sidebar-overlay-visible .sidebar-overlay {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: rgba(10, 15, 26, 0.97);
+            backdrop-filter: blur(24px);
+            z-index: 100;
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-color: var(--border);
+        }
+
+        .left-sidebar {
+            left: 0;
+            transform: translateX(-100%);
+            border-right: 1px solid var(--border);
+        }
+
+        .left-sidebar.open { transform: translateX(0); }
+
+        .right-sidebar {
+            right: 0;
+            transform: translateX(100%);
+            border-left: 1px solid var(--border);
+        }
+
+        .right-sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.15rem;
+            color: var(--text-bright);
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.4rem 0.55rem;
+            border-radius: 8px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 1.4rem 0.55rem;
+            z-index: 50;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 0.08em;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-toggle.left {
+            left: 0;
+            border-radius: 0 14px 14px 0;
+        }
+
+        .sidebar-toggle.right {
+            right: 0;
+            border-radius: 14px 0 0 14px;
+            writing-mode: vertical-lr;
+        }
+
+        .sidebar-toggle:hover {
+            filter: brightness(1.1);
+            padding-top: 1.7rem;
+            padding-bottom: 1.7rem;
+        }
+
+        .story-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.15rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.85rem;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s, background 0.2s, border-color 0.2s;
+        }
+
+        .story-card:hover {
+            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .story-card.featured {
+            border-left-color: var(--success);
+            cursor: pointer;
+        }
+
+        .story-card h3 {
+            margin-bottom: 0.35rem;
+            color: var(--text-bright);
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .story-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Admin panel extras */
+        .admin-status {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1rem;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: var(--radius-sm);
+            color: #6ee7b7;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        body.admin-mode .admin-status { display: flex; }
+
+        .admin-actions {
+            display: none;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        body.admin-mode .admin-actions { display: flex; }
+
+        .admin-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 1rem;
+        }
+
+        /* Modale Fabio */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(12px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: linear-gradient(160deg, #1e293b, #0f172a);
+            padding: 2.25rem;
+            border-radius: 22px;
+            max-width: 620px;
+            width: 100%;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: var(--shadow);
+            transform: translateY(24px) scale(0.97);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-content .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .modal-content h2 {
+            color: var(--text-bright);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            padding-right: 2rem;
+        }
+
+        .modal-content .modal-sub {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-content .modal-body {
+            color: var(--text-bright);
+            font-size: 1.1rem;
+            line-height: 1.65;
+        }
+
+        .modal-content .modal-body strong {
+            color: #a5b4fc;
+        }
+
+        .modal-quote {
+            margin-top: 1.25rem;
+            padding: 1rem 1.25rem;
+            border-left: 4px solid var(--primary-2);
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-style: italic;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 0.85rem 1.25rem;
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            animation: toastIn 0.35s ease-out;
+            pointer-events: all;
+            max-width: 320px;
+        }
+
+        .toast.success { border-color: rgba(16, 185, 129, 0.4); }
+        .toast.error { border-color: rgba(239, 68, 68, 0.4); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3.5rem 2rem;
+            background: rgba(26, 35, 50, 0.5);
+            border-radius: var(--radius);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        footer.app-footer {
+            text-align: center;
+            padding: 2rem 1rem 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 860px;
+            width: 100%;
+        }
+
+        footer.app-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer.app-footer a:hover { text-decoration: underline; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 900px) {
+            :root { --sidebar-w: min(92vw, 340px); }
+
+            body.left-open #app-content,
+            body.right-open #app-content,
+            body.left-open.right-open #app-content {
+                margin: 0;
+                width: 100%;
+            }
+
+            body.left-open #app-content,
+            body.right-open #app-content {
+                filter: blur(2px);
+                pointer-events: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #app-content { padding: 1rem 1rem 3rem; }
+            .idea-form { position: static; }
+            .form-row.inline { flex-direction: column; }
+            .toolbar { flex-direction: column; }
+            .toolbar select { width: 100%; }
+            .toast-container { left: 1rem; right: 1rem; }
+            .toast { max-width: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeAllSidebars()" aria-hidden="true"></div>
+
+    <button class="sidebar-toggle left" onclick="toggleLeftSidebar()" aria-label="Apri pannello storie">🌟 Storie</button>
+    <button class="sidebar-toggle right" onclick="toggleRightSidebar()" aria-label="Apri pannello amministrazione">🔑 Admin</button>
+
+    <!-- Pannello sinistro: Storie -->
+    <aside id="left-sidebar" class="sidebar left-sidebar" aria-label="Storie di successo">
+        <div class="sidebar-header">
+            <h2>Persone di Successo Partite da Zero</h2>
+            <button class="close-btn" onclick="toggleLeftSidebar()" aria-label="Chiudi pannello">✖</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="story-card">
+                <h3>Andrea</h3>
+                <p>Da operaio a sviluppatore: scopri storie di programmatori autodidatti partiti da zero.</p>
+                <a href="https://www.youtube.com/results?search_query=storia+programmatore+autodidatta+italiano" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="width:100%">▶ Guarda su YouTube</a>
+            </div>
+            <div class="story-card">
+                <h3>Giulia</h3>
+                <p>Startup e app di successo nate da una grande idea: lasciati ispirare.</p>
+                <a href="https://www.youtube.com/results?search_query=storie+di+successo+startup+app+italia" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="width:100%">▶ Guarda su YouTube</a>
+            </div>
+            <div class="story-card featured" onclick="openFabioModal()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openFabioModal()">
+                <h3>Scopri la storia di questa App</h3>
+                <p>Dedicato a Fabio Accardo — come l'IA Freddy ha dato vita a Idee Geniali.</p>
+                <span class="btn-secondary" style="width:100%; background: var(--gradient); border: none;">📖 Leggi la Storia</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Pannello destro: Admin -->
+    <aside id="right-sidebar" class="sidebar right-sidebar" aria-label="Amministrazione">
+        <div class="sidebar-header">
+            <h2>🔑 Amministrazione Segreta</h2>
+            <button class="close-btn" onclick="toggleRightSidebar()" aria-label="Chiudi pannello">✖</button>
+        </div>
+        <div class="sidebar-content">
+            <p class="admin-hint">
+                Inserisci la password corretta per sbloccare la moderazione: elimina idee e commenti, esporta i dati o resetta la bacheca.
+            </p>
+            <label class="form-label" for="admin-password">Password</label>
+            <input type="password" id="admin-password" placeholder="Password amministratore..." onkeyup="checkAdminPassword()" autocomplete="off" aria-describedby="admin-hint-text">
+            <div class="admin-status" id="admin-status">
+                <span>●</span> Modalità moderatore attiva
+            </div>
+            <div class="admin-actions">
+                <button type="button" class="btn-secondary" onclick="exportData()">📥 Esporta backup JSON</button>
+                <button type="button" class="btn-danger" onclick="resetBoard()">⚠️ Reset completo bacheca</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Modale Fabio -->
+    <div id="fabio-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fabio-modal-title" onclick="if(event.target===this)closeFabioModal()">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeFabioModal()" aria-label="Chiudi finestra">✖</button>
+            <h2 id="fabio-modal-title">La Storia di Idee Geniali</h2>
+            <p class="modal-sub">Fabio Accardo &amp; Freddy (IA)</p>
+            <div class="modal-body">
+                Questa applicazione è nata dall'<strong>intuizione di Fabio Accardo</strong>. Dimostrando che non servono grandi team o budget milionari per creare software moderno, Fabio ha guidato la sua intelligenza artificiale personale — <strong>Freddy</strong> — per ripulire il codice, superare i blocchi dei server e dare vita a questa bacheca in tempo reale.
+                <p class="modal-quote">«Se ce l'ha fatta Fabio usando la tecnologia nel modo giusto, può farcela chiunque di noi.»</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenuto centrale -->
+    <div id="app-content">
+        <header>
+            <div class="brand-badge">✨ Community · Tempo reale · Zero server</div>
+            <h1>Idee Geniali</h1>
+            <p class="subtitle">Metti la tua idea, proponila alla community e scambia soluzioni.</p>
+            <div class="stats-bar" id="stats-bar" aria-live="polite"></div>
+        </header>
+
+        <main>
+            <div class="idea-form">
+                <form id="add-idea-form">
+                    <div class="form-row">
+                        <label class="form-label" for="author-input">Il tuo nome</label>
+                        <input type="text" id="author-input" placeholder="Come ti chiami?" maxlength="40" required autocomplete="name">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="idea-input">La tua idea</label>
+                        <textarea id="idea-input" placeholder="💡 Qual è la tua idea geniale oggi?" maxlength="500" required></textarea>
+                        <div class="char-hint" id="idea-char-hint">0 / 500</div>
+                    </div>
+                    <div class="form-row inline">
+                        <button type="submit" class="btn-primary" id="submit-idea-btn" style="flex:1">Condividi Idea</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <input type="search" id="search-input" placeholder="Cerca idee o autori..." aria-label="Cerca nella bacheca">
+                </div>
+                <select id="sort-select" aria-label="Ordina idee">
+                    <option value="votes">Più votate</option>
+                    <option value="recent">Più recenti</option>
+                    <option value="comments">Più commentate</option>
+                </select>
+            </div>
+
+            <div class="ideas-container" id="ideas-container" aria-live="polite"></div>
+        </main>
+
+        <footer class="app-footer">
+            Creato da <strong style="color:#fff">Fabio Accardo</strong> con l'IA <strong style="color:#a5b4fc">Freddy</strong> ·
+            <a href="#" onclick="openFabioModal(); return false;">La nostra storia</a>
+        </footer>
+    </div>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <script>
+        const STORAGE_KEY = 'ideeGeniali_data';
+        const AUTHOR_KEY = 'ideeGeniali_author';
+        const ADMIN_SESSION_KEY = 'ideeGeniali_admin';
+        const ADMIN_PASSWORD = 'freddykey';
+
+        let ideas = loadIdeas();
+        let searchQuery = '';
+        let sortMode = 'votes';
+
+        const form = document.getElementById('add-idea-form');
+        const authorInput = document.getElementById('author-input');
+        const ideaInput = document.getElementById('idea-input');
+        const ideaCharHint = document.getElementById('idea-char-hint');
+        const container = document.getElementById('ideas-container');
+        const searchInput = document.getElementById('search-input');
+        const sortSelect = document.getElementById('sort-select');
+        const statsBar = document.getElementById('stats-bar');
+
+        const savedAuthor = localStorage.getItem(AUTHOR_KEY);
+        if (savedAuthor) authorInput.value = savedAuthor;
+
+        if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+            document.getElementById('admin-password').value = ADMIN_PASSWORD;
+            document.body.classList.add('admin-mode');
+        }
+
+        authorInput.addEventListener('input', () => {
+            localStorage.setItem(AUTHOR_KEY, authorInput.value.trim());
+        });
+
+        ideaInput.addEventListener('input', updateCharHint);
+        updateCharHint();
+
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value.trim().toLowerCase();
+            renderIdeas();
+        });
+
+        sortSelect.addEventListener('change', () => {
+            sortMode = sortSelect.value;
+            renderIdeas();
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const author = authorInput.value.trim();
+            const text = ideaInput.value.trim();
+            if (!author || !text) return;
+
+            const newIdea = {
+                id: generateId(),
+                author,
+                text,
+                votes: 0,
+                comments: [],
+                timestamp: new Date().toISOString()
+            };
+
+            ideas.unshift(newIdea);
+            saveData();
+            ideaInput.value = '';
+            updateCharHint();
+            renderIdeas();
+            showToast('Idea pubblicata con successo! 🚀', 'success');
+            document.getElementById('ideas-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        function loadIdeas() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed.map(migrateIdea) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function migrateIdea(idea) {
+            return {
+                id: idea.id || generateId(),
+                author: idea.author || 'Anonimo',
+                text: idea.text || '',
+                votes: typeof idea.votes === 'number' ? idea.votes : 0,
+                comments: Array.isArray(idea.comments)
+                    ? idea.comments.map(c => ({
+                        id: c.id || generateId(),
+                        author: c.author || 'Anonimo',
+                        text: c.text || '',
+                        timestamp: c.timestamp || new Date().toISOString()
+                    }))
+                    : [],
+                timestamp: idea.timestamp || new Date().toISOString()
+            };
+        }
+
+        function generateId() {
+            return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+            updateStats();
+        }
+
+        function updateCharHint() {
+            const len = ideaInput.value.length;
+            const max = 500;
+            ideaCharHint.textContent = `${len} / ${max}`;
+            ideaCharHint.classList.toggle('warn', len > max * 0.9);
+        }
+
+        function updateStats() {
+            const totalComments = ideas.reduce((s, i) => s + i.comments.length, 0);
+            const totalVotes = ideas.reduce((s, i) => s + Math.max(0, i.votes), 0);
+            statsBar.innerHTML = `
+                <span class="stat-pill">💡 <strong>${ideas.length}</strong> idee</span>
+                <span class="stat-pill">💬 <strong>${totalComments}</strong> commenti</span>
+                <span class="stat-pill">👍 <strong>${totalVotes}</strong> voti positivi</span>
+            `;
+        }
+
+        window.handleVote = function(id, change) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            idea.votes += change;
+            saveData();
+            renderIdeas();
+        };
+
+        window.handleDelete = function(id) {
+            if (!document.body.classList.contains('admin-mode')) return;
+            if (!confirm('Sei sicuro di voler rimuovere questa idea?')) return;
+            ideas = ideas.filter(i => i.id !== id);
+            saveData();
+            renderIdeas();
+            showToast('Idea eliminata.', 'success');
+        };
+
+        window.handleDeleteComment = function(ideaId, commentId) {
+            if (!document.body.classList.contains('admin-mode')) return;
+            if (!confirm('Sei sicuro di voler rimuovere questo commento?')) return;
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+            idea.comments = idea.comments.filter(c => c.id !== commentId);
+            saveData();
+            renderIdeas();
+            showToast('Commento eliminato.', 'success');
+        };
+
+        window.handleAddComment = function(id, event) {
+            event.preventDefault();
+            const formNode = event.target;
+            const authorNode = formNode.querySelector('[data-author]');
+            const textNode = formNode.querySelector('[data-text]');
+            const author = authorNode.value.trim();
+            const text = textNode.value.trim();
+            if (!author || !text) return;
+
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+
+            idea.comments.push({
+                id: generateId(),
+                author,
+                text,
+                timestamp: new Date().toISOString()
+            });
+            saveData();
+            renderIdeas();
+            showToast('Commento aggiunto!', 'success');
+        };
+
+        function getFilteredSortedIdeas() {
+            let list = [...ideas];
+
+            if (searchQuery) {
+                list = list.filter(i =>
+                    i.text.toLowerCase().includes(searchQuery) ||
+                    i.author.toLowerCase().includes(searchQuery) ||
+                    i.comments.some(c =>
+                        c.text.toLowerCase().includes(searchQuery) ||
+                        c.author.toLowerCase().includes(searchQuery)
+                    )
+                );
+            }
+
+            if (sortMode === 'recent') {
+                list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            } else if (sortMode === 'comments') {
+                list.sort((a, b) => {
+                    const diff = b.comments.length - a.comments.length;
+                    return diff !== 0 ? diff : new Date(b.timestamp) - new Date(a.timestamp);
+                });
+            } else {
+                list.sort((a, b) => {
+                    if (b.votes !== a.votes) return b.votes - a.votes;
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                });
+            }
+
+            return list;
+        }
+
+        function getInitials(name) {
+            return name
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map(w => w[0].toUpperCase())
+                .join('') || '?';
+        }
+
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffH = Math.floor(diffMs / 3600000);
+            const diffD = Math.floor(diffMs / 86400000);
+
+            if (diffMin < 1) return 'Adesso';
+            if (diffMin < 60) return `${diffMin} min fa`;
+            if (diffH < 24) return `${diffH} h fa`;
+            if (diffD < 7) return `${diffD} g fa`;
+
+            return date.toLocaleDateString('it-IT', {
+                day: 'numeric',
+                month: 'short',
+                year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function renderIdeas() {
+            container.innerHTML = '';
+            const list = getFilteredSortedIdeas();
+            const maxVotes = ideas.length ? Math.max(...ideas.map(i => i.votes)) : 0;
+
+            if (ideas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">🚀</span>
+                        Il foglio è bianco. Scatena la tua creatività e condividi la prima idea!
+                    </div>`;
+                updateStats();
+                return;
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">🔍</span>
+                        Nessuna idea corrisponde alla ricerca. Prova con altre parole chiave.
+                    </div>`;
+                updateStats();
+                return;
+            }
+
+            list.forEach((idea, index) => {
+                const isTop = idea.votes > 0 && idea.votes === maxVotes && maxVotes > 0;
+                const card = document.createElement('article');
+                card.className = 'idea-card' + (isTop ? ' top-idea' : '');
+                card.style.animationDelay = `${Math.min(index * 0.05, 0.4)}s`;
+
+                const savedCommentAuthor = localStorage.getItem(AUTHOR_KEY) || '';
+
+                const commentsHtml = idea.comments.length
+                    ? idea.comments.map(c => `
+                        <div class="comment">
+                            <div class="comment-author">${escapeHTML(c.author)}</div>
+                            <div class="comment-text">${escapeHTML(c.text)}</div>
+                            <div class="comment-footer">
+                                <span class="timestamp">${formatTime(c.timestamp)}</span>
+                                <button type="button" class="delete-btn" onclick="handleDeleteComment('${idea.id}', '${c.id}')" title="Elimina commento">🗑️ Elimina</button>
+                            </div>
+                        </div>
+                    `).join('')
+                    : '<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.5rem">Nessun commento ancora — sii il primo a proporre una soluzione!</p>';
+
+                card.innerHTML = `
+                    <div class="idea-top-row">
+                        <div class="author-block">
+                            <div class="avatar" aria-hidden="true">${escapeHTML(getInitials(idea.author))}</div>
+                            <div class="author-info">
+                                <div class="author-name">${escapeHTML(idea.author)}</div>
+                                <span class="timestamp">${formatTime(idea.timestamp)}</span>
+                            </div>
+                        </div>
+                        ${isTop ? '<span class="top-badge">🏆 Top idea</span>' : ''}
+                    </div>
+                    <p class="idea-text">${escapeHTML(idea.text)}</p>
+                    <div class="idea-meta">
+                        <div class="vote-controls">
+                            <button type="button" class="vote-btn upvote" onclick="handleVote('${idea.id}', 1)" title="Vota in su" aria-label="Vota positivamente">▲</button>
+                            <span class="vote-count" aria-label="Punteggio">${idea.votes}</span>
+                            <button type="button" class="vote-btn downvote" onclick="handleVote('${idea.id}', -1)" title="Vota in giù" aria-label="Vota negativamente">▼</button>
+                        </div>
+                        <button type="button" class="delete-btn" onclick="handleDelete('${idea.id}')" title="Elimina idea">🗑️ Elimina idea</button>
+                    </div>
+                    <section class="comments-section">
+                        <div class="comments-header">Soluzioni e commenti (${idea.comments.length})</div>
+                        <div class="comments-list">${commentsHtml}</div>
+                        <form class="comment-form" onsubmit="handleAddComment('${idea.id}', event)">
+                            <div class="row">
+                                <input type="text" data-author placeholder="Il tuo nome" maxlength="40" required value="${escapeAttr(savedCommentAuthor)}" autocomplete="name">
+                                <input type="text" data-text placeholder="Scrivi un commento o una soluzione..." maxlength="400" required autocomplete="off">
+                            </div>
+                            <button type="submit" class="btn-secondary" style="align-self:flex-start">Invia</button>
+                        </form>
+                    </section>
+                `;
+                container.appendChild(card);
+            });
+
+            updateStats();
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        function escapeAttr(str) {
+            return escapeHTML(str).replace(/`/g, '&#96;');
+        }
+
+        /* Sidebars & modale */
+        function toggleLeftSidebar() {
+            const open = document.getElementById('left-sidebar').classList.toggle('open');
+            document.body.classList.toggle('left-open', open);
+            updateOverlay();
+        }
+
+        function toggleRightSidebar() {
+            const open = document.getElementById('right-sidebar').classList.toggle('open');
+            document.body.classList.toggle('right-open', open);
+            updateOverlay();
+        }
+
+        function closeAllSidebars() {
+            document.getElementById('left-sidebar').classList.remove('open');
+            document.getElementById('right-sidebar').classList.remove('open');
+            document.body.classList.remove('left-open', 'right-open');
+            updateOverlay();
+        }
+
+        function updateOverlay() {
+            const anyOpen = document.body.classList.contains('left-open') ||
+                document.body.classList.contains('right-open');
+            document.body.classList.toggle('sidebar-overlay-visible', anyOpen && window.innerWidth <= 900);
+        }
+
+        function openFabioModal() {
+            document.getElementById('fabio-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFabioModal() {
+            document.getElementById('fabio-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function checkAdminPassword() {
+            const pwd = document.getElementById('admin-password').value;
+            const wasAdmin = document.body.classList.contains('admin-mode');
+            const isAdmin = pwd === ADMIN_PASSWORD;
+            document.body.classList.toggle('admin-mode', isAdmin);
+            if (isAdmin) {
+                sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+                if (!wasAdmin) showToast('Accesso amministratore sbloccato.', 'success');
+            } else {
+                sessionStorage.removeItem(ADMIN_SESSION_KEY);
+            }
+        }
+
+        function exportData() {
+            if (!document.body.classList.contains('admin-mode')) return;
+            const blob = new Blob([JSON.stringify(ideas, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `idee-geniali-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup scaricato.', 'success');
+        }
+
+        function resetBoard() {
+            if (!document.body.classList.contains('admin-mode')) return;
+            if (!confirm('ATTENZIONE: Cancellerai TUTTE le idee e i commenti. Questa azione è irreversibile. Continuare?')) return;
+            if (!confirm('Confermi il reset completo della bacheca?')) return;
+            ideas = [];
+            saveData();
+            renderIdeas();
+            showToast('Bacheca resettata.', 'success');
+        }
+
+        function showToast(message, type = 'success') {
+            const wrap = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.textContent = message;
+            wrap.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(20px)';
+                el.style.transition = '0.3s ease';
+                setTimeout(() => el.remove(), 300);
+            }, 3200);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeFabioModal();
+                closeAllSidebars();
+            }
+        });
+
+        window.addEventListener('resize', updateOverlay);
+
+        renderIdeas();
+    </script>
+</body>
+</html>
