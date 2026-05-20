@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Idee Geniali — Bacheca community in tempo reale per condividere idee e scambiare soluzioni.">
+    <meta name="description" content="Idee Geniali — La bacheca dove creator, startup e sviluppatori condividono idee per software e imprese. Vota, commenta, trova il tuo co-fondatore.">
     <meta name="theme-color" content="#0a0f1a">
-    <title>Idee Geniali</title>
+    <meta property="og:title" content="Idee Geniali — Community di idee per Startup e Software">
+    <meta property="og:description" content="Condividi la tua idea, ricevi feedback e scambia soluzioni con la community.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Idee Geniali — Community Startup &amp; Software</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -41,7 +45,11 @@
             padding: 0;
         }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
 
         body {
             font-family: 'Outfit', sans-serif;
@@ -49,6 +57,7 @@
             color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: visible;
             line-height: 1.5;
         }
 
@@ -192,9 +201,6 @@
             margin-bottom: 1.5rem;
             border: 1px solid var(--border);
             animation: slideUp 0.7s ease-out 0.15s both;
-            position: sticky;
-            top: 1rem;
-            z-index: 10;
             backdrop-filter: blur(16px);
         }
 
@@ -364,8 +370,132 @@
         }
 
         .toolbar select {
-            min-width: 180px;
+            min-width: 160px;
             cursor: pointer;
+        }
+
+        .how-it-works {
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .how-it-works summary {
+            padding: 0.85rem 1.15rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-bright);
+            list-style: none;
+        }
+
+        .how-it-works summary::-webkit-details-marker { display: none; }
+
+        .how-it-works summary::after {
+            content: ' ▾';
+            color: var(--accent);
+            float: right;
+        }
+
+        .how-it-works[open] summary::after { content: ' ▴'; }
+
+        .how-it-works-inner {
+            padding: 0 1.15rem 1rem;
+            display: grid;
+            gap: 0.65rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .how-it-works-inner strong { color: var(--text-bright); }
+
+        .card-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .category-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.28rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+        .trending-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.28rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-share {
+            background: rgba(6, 182, 212, 0.12);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .btn-share:hover {
+            background: rgba(6, 182, 212, 0.22);
+        }
+
+        .btn-whatsapp {
+            background: rgba(37, 211, 102, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(37, 211, 102, 0.45);
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .btn-whatsapp:hover {
+            background: rgba(37, 211, 102, 0.28);
+            color: #86efac;
+        }
+
+        .vote-btn.voted-up {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .launch-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.75rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #6ee7b7;
+            font-size: 0.82rem;
+            font-weight: 600;
+            animation: fadeIn 1s ease-out 0.4s both;
         }
 
         /* Cards idee */
@@ -382,6 +512,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 1.5rem;
+            height: auto;
             display: flex;
             flex-direction: column;
             gap: 1rem;
@@ -443,13 +574,58 @@
             text-overflow: ellipsis;
         }
 
+        /* Blocco idea: anteprima corta + "Leggi tutto" | espanso = testo intero, scroll solo pagina */
+        .idea-body {
+            display: block;
+            position: relative;
+        }
+
         .idea-text {
-            font-size: 1.15rem;
+            font-size: clamp(1.05rem, 2.8vw, 1.2rem);
             font-weight: 500;
-            line-height: 1.55;
+            line-height: 1.65;
             color: var(--text-main);
-            margin-top: 0.25rem;
+            margin-top: 0.35rem;
+            white-space: pre-wrap;
             word-break: break-word;
+            overflow: visible;
+            max-height: none;
+        }
+
+        .idea-card.is-collapsed .idea-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .idea-card.is-collapsed .idea-text::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2.5rem;
+            background: linear-gradient(to bottom, transparent, rgba(17, 24, 39, 0.95));
+            pointer-events: none;
+        }
+
+        .read-toggle {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0;
+            background: none;
+            border: none;
+            color: #67e8f9;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .read-toggle:hover {
+            color: #a5f3fc;
+            text-decoration: underline;
         }
 
         .top-badge {
@@ -865,6 +1041,53 @@
             color: #a5b4fc;
         }
 
+        .modal-content.modal-fabio {
+            max-width: 720px;
+        }
+
+        .fabio-story-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .fabio-photo-wrap {
+            flex-shrink: 0;
+        }
+
+        .fabio-photo {
+            display: block;
+            width: 148px;
+            height: 178px;
+            object-fit: cover;
+            object-position: center 18%;
+            border-radius: 16px;
+            border: 3px solid rgba(139, 92, 246, 0.45);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        .fabio-story-layout .modal-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        @media (max-width: 560px) {
+            .fabio-story-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .fabio-photo {
+                width: 130px;
+                height: 156px;
+            }
+
+            .fabio-story-layout .modal-body {
+                text-align: left;
+                width: 100%;
+            }
+        }
+
         .modal-quote {
             margin-top: 1.25rem;
             padding: 1rem 1.25rem;
@@ -1058,13 +1281,18 @@
 
     <!-- Modale Fabio -->
     <div id="fabio-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fabio-modal-title" onclick="if(event.target===this)closeFabioModal()">
-        <div class="modal-content">
+        <div class="modal-content modal-fabio">
             <button class="close-btn" onclick="closeFabioModal()" aria-label="Chiudi finestra">✖</button>
             <h2 id="fabio-modal-title">La Storia di Idee Geniali</h2>
             <p class="modal-sub">Fabio Accardo &amp; Freddy (IA)</p>
-            <div class="modal-body">
-                Questa applicazione è nata dall'<strong>intuizione di Fabio Accardo</strong>. Dimostrando che non servono grandi team o budget milionari per creare software moderno, Fabio ha guidato la sua intelligenza artificiale personale — <strong>Freddy</strong> — per ripulire il codice, superare i blocchi dei server e dare vita a questa bacheca in tempo reale.
-                <p class="modal-quote">«Se ce l'ha fatta Fabio usando la tecnologia nel modo giusto, può farcela chiunque di noi.»</p>
+            <div class="fabio-story-layout">
+                <div class="fabio-photo-wrap">
+                    <img src="fabio-accardo.png" alt="Fabio Accardo, creatore di Idee Geniali" class="fabio-photo" width="148" height="178" loading="lazy">
+                </div>
+                <div class="modal-body">
+                    Questa applicazione è nata dall'<strong>intuizione di Fabio Accardo</strong>. Dimostrando che non servono grandi team o budget milionari per creare software moderno, Fabio ha guidato la sua intelligenza artificiale personale — <strong>Freddy</strong> — per ripulire il codice, superare i blocchi dei server e dare vita a questa bacheca in tempo reale.
+                    <p class="modal-quote">«Se ce l'ha fatta Fabio usando la tecnologia nel modo giusto, può farcela chiunque di noi.»</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1075,8 +1303,19 @@
             <div class="brand-badge">✨ Community · Tempo reale · Zero server</div>
             <h1>Idee Geniali</h1>
             <p class="subtitle">Metti la tua idea, proponila alla community e scambia soluzioni.</p>
+            <div class="launch-banner">🌍 Pronta per il lancio — condividi con il mondo</div>
             <div class="stats-bar" id="stats-bar" aria-live="polite"></div>
         </header>
+
+        <details class="how-it-works">
+            <summary>Come funziona la community</summary>
+            <div class="how-it-works-inner">
+                <p><strong>1. Pubblica</strong> — Nome, categoria (Startup, Software, App…) e la tua idea.</p>
+                <p><strong>2. Vota</strong> — La community alza le idee più promettenti in classifica.</p>
+                <p><strong>3. Collabora</strong> — Commenta con soluzioni, contatti o feedback per nuovi progetti.</p>
+                <p><strong>4. Condividi</strong> — Pulsante <strong>WhatsApp</strong> (un’idea alla volta) o <strong>Condividi</strong> per social e copia.</p>
+            </div>
+        </details>
 
         <main>
             <div class="idea-form">
@@ -1086,9 +1325,20 @@
                         <input type="text" id="author-input" placeholder="Come ti chiami?" maxlength="40" required autocomplete="name">
                     </div>
                     <div class="form-row">
+                        <label class="form-label" for="category-input">Categoria</label>
+                        <select id="category-input" required aria-label="Categoria dell'idea">
+                            <option value="startup">🚀 Startup</option>
+                            <option value="software">💻 Software</option>
+                            <option value="app">📱 App mobile</option>
+                            <option value="saas">☁️ SaaS / Web</option>
+                            <option value="social">👥 Social / Community</option>
+                            <option value="altro">✨ Altro</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
                         <label class="form-label" for="idea-input">La tua idea</label>
-                        <textarea id="idea-input" placeholder="💡 Qual è la tua idea geniale oggi?" maxlength="500" required></textarea>
-                        <div class="char-hint" id="idea-char-hint">0 / 500</div>
+                        <textarea id="idea-input" placeholder="💡 Descrivi la tua idea: problema, soluzione, a chi serve… (co-fondatori e feedback benvenuti!)" maxlength="12000" required></textarea>
+                        <div class="char-hint" id="idea-char-hint">0 / 12000</div>
                     </div>
                     <div class="form-row inline">
                         <button type="submit" class="btn-primary" id="submit-idea-btn" style="flex:1">Condividi Idea</button>
@@ -1100,6 +1350,15 @@
                 <div class="search-wrap">
                     <input type="search" id="search-input" placeholder="Cerca idee o autori..." aria-label="Cerca nella bacheca">
                 </div>
+                <select id="category-filter" aria-label="Filtra per categoria">
+                    <option value="">Tutte le categorie</option>
+                    <option value="startup">🚀 Startup</option>
+                    <option value="software">💻 Software</option>
+                    <option value="app">📱 App</option>
+                    <option value="saas">☁️ SaaS</option>
+                    <option value="social">👥 Social</option>
+                    <option value="altro">✨ Altro</option>
+                </select>
                 <select id="sort-select" aria-label="Ordina idee">
                     <option value="votes">Più votate</option>
                     <option value="recent">Più recenti</option>
@@ -1116,6 +1375,20 @@
         </footer>
     </div>
 
+    <!-- Benvenuto primo accesso -->
+    <div id="welcome-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeWelcomeModal()" aria-label="Chiudi">✖</button>
+            <h2 id="welcome-title">Benvenuto in Idee Geniali 🚀</h2>
+            <p class="modal-sub">La tua palestra di idee per startup e software</p>
+            <div class="modal-body">
+                Qui imprenditori e creator si incontrano: pubblichi un’idea, la community vota e commenta con soluzioni vere.
+                <p class="modal-quote">Sii il primo a lasciare il segno — il prossimo unicorno potrebbe nascere dal tuo post.</p>
+            </div>
+            <button type="button" class="btn-primary" style="width:100%; margin-top:1rem" onclick="closeWelcomeModal()">Entra nella community</button>
+        </div>
+    </div>
+
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <script>
@@ -1123,17 +1396,37 @@
         const AUTHOR_KEY = 'ideeGeniali_author';
         const ADMIN_SESSION_KEY = 'ideeGeniali_admin';
         const ADMIN_PASSWORD = 'freddykey';
+        const EXPANDED_KEY = 'ideeGeniali_expanded';
+        const VOTES_KEY = 'ideeGeniali_user_votes';
+        const WELCOME_KEY = 'ideeGeniali_welcome_seen';
+        const PREVIEW_CHARS = 220;
+        const PREVIEW_LINES = 4;
+        const TRENDING_VOTES = 2;
+
+        const CATEGORIES = {
+            startup: { label: '🚀 Startup', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' },
+            software: { label: '💻 Software', color: '#60a5fa', bg: 'rgba(59,130,246,0.15)' },
+            app: { label: '📱 App', color: '#a78bfa', bg: 'rgba(139,92,246,0.15)' },
+            saas: { label: '☁️ SaaS', color: '#22d3ee', bg: 'rgba(6,182,212,0.15)' },
+            social: { label: '👥 Social', color: '#f472b6', bg: 'rgba(236,72,153,0.15)' },
+            altro: { label: '✨ Altro', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' }
+        };
 
         let ideas = loadIdeas();
         let searchQuery = '';
+        let categoryFilter = '';
         let sortMode = 'votes';
+        let expandedIds = new Set(loadExpandedIds());
+        let userVotes = loadUserVotes();
 
         const form = document.getElementById('add-idea-form');
         const authorInput = document.getElementById('author-input');
+        const categoryInput = document.getElementById('category-input');
         const ideaInput = document.getElementById('idea-input');
         const ideaCharHint = document.getElementById('idea-char-hint');
         const container = document.getElementById('ideas-container');
         const searchInput = document.getElementById('search-input');
+        const categoryFilterSelect = document.getElementById('category-filter');
         const sortSelect = document.getElementById('sort-select');
         const statsBar = document.getElementById('stats-bar');
 
@@ -1162,16 +1455,23 @@
             renderIdeas();
         });
 
+        categoryFilterSelect.addEventListener('change', () => {
+            categoryFilter = categoryFilterSelect.value;
+            renderIdeas();
+        });
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const author = authorInput.value.trim();
             const text = ideaInput.value.trim();
+            const category = categoryInput.value;
             if (!author || !text) return;
 
             const newIdea = {
                 id: generateId(),
                 author,
                 text,
+                category,
                 votes: 0,
                 comments: [],
                 timestamp: new Date().toISOString()
@@ -1183,8 +1483,35 @@
             updateCharHint();
             renderIdeas();
             showToast('Idea pubblicata con successo! 🚀', 'success');
-            document.getElementById('ideas-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+
+        function loadExpandedIds() {
+            try {
+                const raw = sessionStorage.getItem(EXPANDED_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveExpandedIds() {
+            sessionStorage.setItem(EXPANDED_KEY, JSON.stringify([...expandedIds]));
+        }
+
+        function isLongIdea(text) {
+            return text.length > PREVIEW_CHARS || text.split('\n').length > PREVIEW_LINES;
+        }
+
+        window.toggleRead = function(id) {
+            if (expandedIds.has(id)) {
+                expandedIds.delete(id);
+            } else {
+                expandedIds.add(id);
+            }
+            saveExpandedIds();
+            renderIdeas();
+        };
 
         function loadIdeas() {
             try {
@@ -1196,11 +1523,84 @@
             }
         }
 
+        function loadUserVotes() {
+            try {
+                const raw = localStorage.getItem(VOTES_KEY);
+                const obj = raw ? JSON.parse(raw) : {};
+                return obj && typeof obj === 'object' ? obj : {};
+            } catch {
+                return {};
+            }
+        }
+
+        function saveUserVotes() {
+            localStorage.setItem(VOTES_KEY, JSON.stringify(userVotes));
+        }
+
+        function getCategoryMeta(cat) {
+            return CATEGORIES[cat] || CATEGORIES.altro;
+        }
+
+        function closeWelcomeModal() {
+            document.getElementById('welcome-modal').classList.remove('open');
+            localStorage.setItem(WELCOME_KEY, '1');
+        }
+
+        function maybeShowWelcome() {
+            if (!localStorage.getItem(WELCOME_KEY)) {
+                document.getElementById('welcome-modal').classList.add('open');
+            }
+        }
+
+        const SITE_URL = 'https://freddy197.github.io/IdeeGeniali/';
+
+        function buildShareText(idea) {
+            const cat = getCategoryMeta(idea.category);
+            return `💡 ${idea.author} su Idee Geniali [${cat.label}]\n\n${idea.text}\n\n👉 ${SITE_URL}`;
+        }
+
+        window.shareWhatsApp = function(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            const url = `https://wa.me/?text=${encodeURIComponent(buildShareText(idea))}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+            showToast('Scegli il contatto su WhatsApp…', 'success');
+        };
+
+        window.shareIdea = async function(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            const shareText = buildShareText(idea);
+
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Idee Geniali',
+                        text: shareText,
+                        url: SITE_URL
+                    });
+                    showToast('Idea condivisa!', 'success');
+                    return;
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(shareText);
+                showToast('Testo copiato — incollalo dove vuoi!', 'success');
+            } catch {
+                showToast('Copia non disponibile su questo browser.', 'error');
+            }
+        };
+
         function migrateIdea(idea) {
+            const cat = CATEGORIES[idea.category] ? idea.category : 'altro';
             return {
                 id: idea.id || generateId(),
                 author: idea.author || 'Anonimo',
                 text: idea.text || '',
+                category: cat,
                 votes: typeof idea.votes === 'number' ? idea.votes : 0,
                 comments: Array.isArray(idea.comments)
                     ? idea.comments.map(c => ({
@@ -1225,7 +1625,7 @@
 
         function updateCharHint() {
             const len = ideaInput.value.length;
-            const max = 500;
+            const max = 12000;
             ideaCharHint.textContent = `${len} / ${max}`;
             ideaCharHint.classList.toggle('warn', len > max * 0.9);
         }
@@ -1233,17 +1633,29 @@
         function updateStats() {
             const totalComments = ideas.reduce((s, i) => s + i.comments.length, 0);
             const totalVotes = ideas.reduce((s, i) => s + Math.max(0, i.votes), 0);
+            const startups = ideas.filter(i => i.category === 'startup').length;
             statsBar.innerHTML = `
                 <span class="stat-pill">💡 <strong>${ideas.length}</strong> idee</span>
+                <span class="stat-pill">🚀 <strong>${startups}</strong> startup</span>
                 <span class="stat-pill">💬 <strong>${totalComments}</strong> commenti</span>
-                <span class="stat-pill">👍 <strong>${totalVotes}</strong> voti positivi</span>
+                <span class="stat-pill">👍 <strong>${totalVotes}</strong> voti</span>
             `;
         }
 
         window.handleVote = function(id, change) {
             const idea = ideas.find(i => i.id === id);
             if (!idea) return;
+
+            const prev = userVotes[id];
+            if (prev === change) {
+                showToast('Hai già espresso questo voto.', 'error');
+                return;
+            }
+
+            if (prev) idea.votes -= prev;
             idea.votes += change;
+            userVotes[id] = change;
+            saveUserVotes();
             saveData();
             renderIdeas();
         };
@@ -1294,10 +1706,15 @@
         function getFilteredSortedIdeas() {
             let list = [...ideas];
 
+            if (categoryFilter) {
+                list = list.filter(i => i.category === categoryFilter);
+            }
+
             if (searchQuery) {
                 list = list.filter(i =>
                     i.text.toLowerCase().includes(searchQuery) ||
                     i.author.toLowerCase().includes(searchQuery) ||
+                    getCategoryMeta(i.category).label.toLowerCase().includes(searchQuery) ||
                     i.comments.some(c =>
                         c.text.toLowerCase().includes(searchQuery) ||
                         c.author.toLowerCase().includes(searchQuery)
@@ -1380,9 +1797,24 @@
 
             list.forEach((idea, index) => {
                 const isTop = idea.votes > 0 && idea.votes === maxVotes && maxVotes > 0;
+                const isTrending = idea.votes >= TRENDING_VOTES;
+                const isLong = isLongIdea(idea.text);
+                const isExpanded = expandedIds.has(idea.id);
+                const cat = getCategoryMeta(idea.category);
+                const myVote = userVotes[idea.id];
                 const card = document.createElement('article');
-                card.className = 'idea-card' + (isTop ? ' top-idea' : '');
+                card.dataset.ideaId = idea.id;
+                card.className = 'idea-card' +
+                    (isTop ? ' top-idea' : '') +
+                    (isLong && !isExpanded ? ' is-collapsed' : '');
                 card.style.animationDelay = `${Math.min(index * 0.05, 0.4)}s`;
+
+                const badgesHtml = `
+                    <div class="card-badges">
+                        <span class="category-badge" style="color:${cat.color};border-color:${cat.color};background:${cat.bg}">${cat.label}</span>
+                        ${isTrending ? '<span class="trending-badge">🔥 In tendenza</span>' : ''}
+                        ${isTop ? '<span class="top-badge">🏆 Top</span>' : ''}
+                    </div>`;
 
                 const savedCommentAuthor = localStorage.getItem(AUTHOR_KEY) || '';
 
@@ -1408,16 +1840,24 @@
                                 <span class="timestamp">${formatTime(idea.timestamp)}</span>
                             </div>
                         </div>
-                        ${isTop ? '<span class="top-badge">🏆 Top idea</span>' : ''}
+                        ${badgesHtml}
                     </div>
-                    <p class="idea-text">${escapeHTML(idea.text)}</p>
+                    <div class="idea-body">
+                        <div class="idea-text">${escapeHTML(idea.text)}</div>
+                        ${isLong && !isExpanded ? `<button type="button" class="read-toggle" onclick="toggleRead('${idea.id}')">Leggi tutto</button>` : ''}
+                        ${isLong && isExpanded ? `<button type="button" class="read-toggle" onclick="toggleRead('${idea.id}')">Mostra meno</button>` : ''}
+                    </div>
                     <div class="idea-meta">
-                        <div class="vote-controls">
-                            <button type="button" class="vote-btn upvote" onclick="handleVote('${idea.id}', 1)" title="Vota in su" aria-label="Vota positivamente">▲</button>
-                            <span class="vote-count" aria-label="Punteggio">${idea.votes}</span>
-                            <button type="button" class="vote-btn downvote" onclick="handleVote('${idea.id}', -1)" title="Vota in giù" aria-label="Vota negativamente">▼</button>
+                        <div class="card-actions">
+                            <div class="vote-controls">
+                                <button type="button" class="vote-btn upvote${myVote === 1 ? ' voted-up' : ''}" onclick="handleVote('${idea.id}', 1)" title="Vota in su" aria-label="Vota positivamente">▲</button>
+                                <span class="vote-count" aria-label="Punteggio">${idea.votes}</span>
+                                <button type="button" class="vote-btn downvote" onclick="handleVote('${idea.id}', -1)" title="Vota in giù" aria-label="Vota negativamente">▼</button>
+                            </div>
+                            <button type="button" class="btn-whatsapp" onclick="shareWhatsApp('${idea.id}')" title="Condividi su WhatsApp">💬 WhatsApp</button>
+                            <button type="button" class="btn-share" onclick="shareIdea('${idea.id}')" title="Condividi o copia">📤 Condividi</button>
                         </div>
-                        <button type="button" class="delete-btn" onclick="handleDelete('${idea.id}')" title="Elimina idea">🗑️ Elimina idea</button>
+                        <button type="button" class="delete-btn" onclick="handleDelete('${idea.id}')" title="Elimina idea">🗑️ Elimina</button>
                     </div>
                     <section class="comments-section">
                         <div class="comments-header">Soluzioni e commenti (${idea.comments.length})</div>
@@ -1425,7 +1865,7 @@
                         <form class="comment-form" onsubmit="handleAddComment('${idea.id}', event)">
                             <div class="row">
                                 <input type="text" data-author placeholder="Il tuo nome" maxlength="40" required value="${escapeAttr(savedCommentAuthor)}" autocomplete="name">
-                                <input type="text" data-text placeholder="Scrivi un commento o una soluzione..." maxlength="400" required autocomplete="off">
+                                <input type="text" data-text placeholder="Proponi una soluzione, un contatto o un feedback…" maxlength="400" required autocomplete="off">
                             </div>
                             <button type="submit" class="btn-secondary" style="align-self:flex-start">Invia</button>
                         </form>
@@ -1536,6 +1976,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeFabioModal();
+                closeWelcomeModal();
                 closeAllSidebars();
             }
         });
@@ -1543,6 +1984,7 @@
         window.addEventListener('resize', updateOverlay);
 
         renderIdeas();
+        maybeShowWelcome();
     </script>
 </body>
 </html>
