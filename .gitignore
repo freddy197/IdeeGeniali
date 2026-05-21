@@ -1,0 +1,17 @@
+# Cartella progetto Python separata (ha il suo Git in star_tap/)
+star_tap/
+
+# Dipendenze Node
+node_modules/
+
+# Python / ambiente
+__pycache__/
+.env
+venv/
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
