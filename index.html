@@ -1162,6 +1162,44 @@
 
         footer.app-footer a:hover { text-decoration: underline; }
 
+        .cloud-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.65rem;
+            padding: 0.4rem 0.95rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        .cloud-status.cloud-ok {
+            background: rgba(16, 185, 129, 0.12);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .cloud-status.cloud-warn {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fcd34d;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .cloud-status.cloud-loading {
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        .ideas-loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -1300,10 +1338,11 @@
     <!-- Contenuto centrale -->
     <div id="app-content">
         <header>
-            <div class="brand-badge">✨ Community · Tempo reale · Zero server</div>
+            <div class="brand-badge">✨ Community · Cloud Firebase · Tempo reale</div>
             <h1>Idee Geniali</h1>
             <p class="subtitle">Metti la tua idea, proponila alla community e scambia soluzioni.</p>
             <div class="launch-banner">🌍 Pronta per il lancio — condividi con il mondo</div>
+            <div id="cloud-status" class="cloud-status cloud-loading">☁️ Connessione al cloud…</div>
             <div class="stats-bar" id="stats-bar" aria-live="polite"></div>
         </header>
 
@@ -1391,8 +1430,13 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
     <script>
         const STORAGE_KEY = 'ideeGeniali_data';
+        const FIRESTORE_COLLECTION = 'ideas';
         const AUTHOR_KEY = 'ideeGeniali_author';
         const ADMIN_SESSION_KEY = 'ideeGeniali_admin';
         const ADMIN_PASSWORD = 'freddykey';
@@ -1412,7 +1456,10 @@
             altro: { label: '✨ Altro', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' }
         };
 
-        let ideas = loadIdeas();
+        let ideas = [];
+        let db = null;
+        let cloudConnected = false;
+        let useLocalOnly = false;
         let searchQuery = '';
         let categoryFilter = '';
         let sortMode = 'votes';
@@ -1460,7 +1507,7 @@
             renderIdeas();
         });
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const author = authorInput.value.trim();
             const text = ideaInput.value.trim();
@@ -1477,12 +1524,15 @@
                 timestamp: new Date().toISOString()
             };
 
-            ideas.unshift(newIdea);
-            saveData();
-            ideaInput.value = '';
-            updateCharHint();
-            renderIdeas();
-            showToast('Idea pubblicata con successo! 🚀', 'success');
+            try {
+                await saveIdea(newIdea);
+                ideaInput.value = '';
+                updateCharHint();
+                showToast('Idea pubblicata — visibile a tutti! 🚀', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Errore pubblicazione. Riprova.', 'error');
+            }
         });
 
         function loadExpandedIds() {
@@ -1513,7 +1563,7 @@
             renderIdeas();
         };
 
-        function loadIdeas() {
+        function loadIdeasLocal() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 const parsed = raw ? JSON.parse(raw) : [];
@@ -1521,6 +1571,120 @@
             } catch {
                 return [];
             }
+        }
+
+        function saveIdeasLocal() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+            updateStats();
+        }
+
+        function isFirebaseConfigured() {
+            const c = window.firebaseConfig;
+            return c && c.apiKey && !String(c.apiKey).includes('INSERISCI');
+        }
+
+        function updateCloudStatus(mode) {
+            const el = document.getElementById('cloud-status');
+            if (!el) return;
+            el.className = 'cloud-status';
+            if (mode === 'ok') {
+                el.classList.add('cloud-ok');
+                el.textContent = '☁️ Cloud attivo — tutti vedono la stessa bacheca';
+            } else if (mode === 'warn') {
+                el.classList.add('cloud-warn');
+                el.textContent = '⚠️ Solo questo dispositivo — configura firebase-config.js';
+            } else if (mode === 'loading') {
+                el.classList.add('cloud-loading');
+                el.textContent = '☁️ Connessione al cloud…';
+            } else {
+                el.classList.add('cloud-warn');
+                el.textContent = '⚠️ Modalità locale — cloud non connesso';
+            }
+        }
+
+        function initFirebaseApp() {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(window.firebaseConfig);
+            }
+            db = firebase.firestore();
+        }
+
+        function startIdeasListener() {
+            return db.collection(FIRESTORE_COLLECTION)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot((snapshot) => {
+                    ideas = snapshot.docs.map(doc => migrateIdea({ id: doc.id, ...doc.data() }));
+                    cloudConnected = true;
+                    updateCloudStatus('ok');
+                    renderIdeas();
+                }, (error) => {
+                    console.error('Firestore:', error);
+                    useLocalOnly = true;
+                    ideas = loadIdeasLocal();
+                    updateCloudStatus('warn');
+                    renderIdeas();
+                    showToast('Cloud non disponibile — uso dati locali.', 'error');
+                });
+        }
+
+        async function maybeMigrateLocalToCloud() {
+            const local = loadIdeasLocal();
+            if (local.length === 0) return;
+
+            const snap = await db.collection(FIRESTORE_COLLECTION).limit(1).get();
+            if (!snap.empty) return;
+
+            const batch = db.batch();
+            local.forEach(idea => {
+                const ref = db.collection(FIRESTORE_COLLECTION).doc(idea.id);
+                batch.set(ref, ideaToFirestore(idea));
+            });
+            await batch.commit();
+            localStorage.removeItem(STORAGE_KEY);
+            showToast('Le tue idee locali sono state migrate nel cloud!', 'success');
+        }
+
+        function ideaToFirestore(idea) {
+            return {
+                author: idea.author,
+                text: idea.text,
+                category: idea.category,
+                votes: idea.votes,
+                comments: idea.comments,
+                timestamp: idea.timestamp
+            };
+        }
+
+        async function saveIdea(idea) {
+            if (db) {
+                await db.collection(FIRESTORE_COLLECTION).doc(idea.id).set(ideaToFirestore(idea));
+                return;
+            }
+            ideas.unshift(idea);
+            saveIdeasLocal();
+            renderIdeas();
+        }
+
+        async function updateIdeaInCloud(id, data) {
+            if (db) {
+                await db.collection(FIRESTORE_COLLECTION).doc(id).update(data);
+                return;
+            }
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+            Object.assign(idea, data);
+            saveIdeasLocal();
+            renderIdeas();
+        }
+
+        async function deleteIdeaFromCloud(id) {
+            if (db) {
+                await db.collection(FIRESTORE_COLLECTION).doc(id).delete();
+                return;
+            }
+            ideas = ideas.filter(i => i.id !== id);
+            saveIdeasLocal();
+            renderIdeas();
         }
 
         function loadUserVotes() {
@@ -1618,11 +1782,6 @@
             return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
         }
 
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
-            updateStats();
-        }
-
         function updateCharHint() {
             const len = ideaInput.value.length;
             const max = 12000;
@@ -1642,7 +1801,7 @@
             `;
         }
 
-        window.handleVote = function(id, change) {
+        window.handleVote = async function(id, change) {
             const idea = ideas.find(i => i.id === id);
             if (!idea) return;
 
@@ -1652,35 +1811,48 @@
                 return;
             }
 
-            if (prev) idea.votes -= prev;
-            idea.votes += change;
+            let newVotes = idea.votes;
+            if (prev) newVotes -= prev;
+            newVotes += change;
             userVotes[id] = change;
             saveUserVotes();
-            saveData();
-            renderIdeas();
+
+            try {
+                await updateIdeaInCloud(id, { votes: newVotes });
+            } catch (err) {
+                console.error(err);
+                showToast('Errore nel salvataggio del voto.', 'error');
+            }
         };
 
-        window.handleDelete = function(id) {
+        window.handleDelete = async function(id) {
             if (!document.body.classList.contains('admin-mode')) return;
             if (!confirm('Sei sicuro di voler rimuovere questa idea?')) return;
-            ideas = ideas.filter(i => i.id !== id);
-            saveData();
-            renderIdeas();
-            showToast('Idea eliminata.', 'success');
+            try {
+                await deleteIdeaFromCloud(id);
+                showToast('Idea eliminata.', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Errore eliminazione.', 'error');
+            }
         };
 
-        window.handleDeleteComment = function(ideaId, commentId) {
+        window.handleDeleteComment = async function(ideaId, commentId) {
             if (!document.body.classList.contains('admin-mode')) return;
             if (!confirm('Sei sicuro di voler rimuovere questo commento?')) return;
             const idea = ideas.find(i => i.id === ideaId);
             if (!idea) return;
-            idea.comments = idea.comments.filter(c => c.id !== commentId);
-            saveData();
-            renderIdeas();
-            showToast('Commento eliminato.', 'success');
+            const newComments = idea.comments.filter(c => c.id !== commentId);
+            try {
+                await updateIdeaInCloud(ideaId, { comments: newComments });
+                showToast('Commento eliminato.', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Errore eliminazione commento.', 'error');
+            }
         };
 
-        window.handleAddComment = function(id, event) {
+        window.handleAddComment = async function(id, event) {
             event.preventDefault();
             const formNode = event.target;
             const authorNode = formNode.querySelector('[data-author]');
@@ -1692,15 +1864,24 @@
             const idea = ideas.find(i => i.id === id);
             if (!idea) return;
 
-            idea.comments.push({
-                id: generateId(),
-                author,
-                text,
-                timestamp: new Date().toISOString()
-            });
-            saveData();
-            renderIdeas();
-            showToast('Commento aggiunto!', 'success');
+            const newComments = [
+                ...idea.comments,
+                {
+                    id: generateId(),
+                    author,
+                    text,
+                    timestamp: new Date().toISOString()
+                }
+            ];
+
+            try {
+                await updateIdeaInCloud(id, { comments: newComments });
+                textNode.value = '';
+                showToast('Commento aggiunto — visibile a tutti!', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Errore invio commento.', 'error');
+            }
         };
 
         function getFilteredSortedIdeas() {
@@ -1774,6 +1955,11 @@
             container.innerHTML = '';
             const list = getFilteredSortedIdeas();
             const maxVotes = ideas.length ? Math.max(...ideas.map(i => i.votes)) : 0;
+
+            if (!useLocalOnly && isFirebaseConfigured() && !cloudConnected) {
+                container.innerHTML = `<div class="ideas-loading">☁️ Caricamento bacheca dal cloud…</div>`;
+                return;
+            }
 
             if (ideas.length === 0) {
                 container.innerHTML = `
@@ -1949,14 +2135,26 @@
             showToast('Backup scaricato.', 'success');
         }
 
-        function resetBoard() {
+        async function resetBoard() {
             if (!document.body.classList.contains('admin-mode')) return;
-            if (!confirm('ATTENZIONE: Cancellerai TUTTE le idee e i commenti. Questa azione è irreversibile. Continuare?')) return;
+            if (!confirm('ATTENZIONE: Cancellerai TUTTE le idee e i commenti nel CLOUD. Irreversibile. Continuare?')) return;
             if (!confirm('Confermi il reset completo della bacheca?')) return;
-            ideas = [];
-            saveData();
-            renderIdeas();
-            showToast('Bacheca resettata.', 'success');
+            try {
+                if (db) {
+                    const snap = await db.collection(FIRESTORE_COLLECTION).get();
+                    const batch = db.batch();
+                    snap.docs.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                } else {
+                    ideas = [];
+                    saveIdeasLocal();
+                    renderIdeas();
+                }
+                showToast('Bacheca resettata.', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Errore reset bacheca.', 'error');
+            }
         }
 
         function showToast(message, type = 'success') {
@@ -1983,8 +2181,34 @@
 
         window.addEventListener('resize', updateOverlay);
 
-        renderIdeas();
-        maybeShowWelcome();
+        async function initApp() {
+            updateCloudStatus('loading');
+            container.innerHTML = `<div class="ideas-loading">☁️ Caricamento bacheca…</div>`;
+
+            if (isFirebaseConfigured() && typeof firebase !== 'undefined') {
+                try {
+                    initFirebaseApp();
+                    await maybeMigrateLocalToCloud();
+                    startIdeasListener();
+                } catch (err) {
+                    console.error(err);
+                    useLocalOnly = true;
+                    ideas = loadIdeasLocal();
+                    updateCloudStatus('warn');
+                    renderIdeas();
+                    showToast('Firebase non configurato correttamente.', 'error');
+                }
+            } else {
+                useLocalOnly = true;
+                ideas = loadIdeasLocal();
+                updateCloudStatus('warn');
+                renderIdeas();
+            }
+
+            maybeShowWelcome();
+        }
+
+        initApp();
     </script>
 </body>
 </html>
