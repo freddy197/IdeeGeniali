@@ -1430,7 +1430,7 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-    <script src="firebase-config.js?v=2"></script>
+    <script src="firebase-config.js?v=3"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
@@ -1593,6 +1593,9 @@
             } else if (mode === 'warn') {
                 el.classList.add('cloud-warn');
                 el.textContent = '⚠️ Solo questo dispositivo — configura firebase-config.js';
+            } else if (mode === 'error_rules') {
+                el.classList.add('cloud-warn');
+                el.textContent = '⚠️ Database bloccato — aggiorna le Regole su Firebase';
             } else if (mode === 'loading') {
                 el.classList.add('cloud-loading');
                 el.textContent = '☁️ Connessione al cloud…';
@@ -1621,9 +1624,16 @@
                     console.error('Firestore:', error);
                     useLocalOnly = true;
                     ideas = loadIdeasLocal();
-                    updateCloudStatus('warn');
+                    
+                    if (error.code === 'permission-denied' || error.message.includes('Missing or insufficient permissions')) {
+                        updateCloudStatus('error_rules');
+                        showToast('Permessi negati: devi pubblicare firestore.rules', 'error');
+                    } else {
+                        updateCloudStatus('warn');
+                        showToast('Cloud non disponibile — uso dati locali.', 'error');
+                    }
+                    
                     renderIdeas();
-                    showToast('Cloud non disponibile — uso dati locali.', 'error');
                 });
         }
 
