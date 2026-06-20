@@ -1430,7 +1430,7 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-    <script src="firebase-config.js"></script>
+    <script src="firebase-config.js?v=2"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
@@ -1631,17 +1631,27 @@
             const local = loadIdeasLocal();
             if (local.length === 0) return;
 
-            const snap = await db.collection(FIRESTORE_COLLECTION).limit(1).get();
-            if (!snap.empty) return;
-
+            // Per non perdere i dati, migriamo le idee locali nel cloud
+            // anche se il database non è vuoto. Controlliamo se l'idea esiste già.
+            let migratedCount = 0;
             const batch = db.batch();
-            local.forEach(idea => {
+            
+            for (const idea of local) {
                 const ref = db.collection(FIRESTORE_COLLECTION).doc(idea.id);
-                batch.set(ref, ideaToFirestore(idea));
-            });
-            await batch.commit();
+                const docSnap = await ref.get();
+                if (!docSnap.exists) {
+                    batch.set(ref, ideaToFirestore(idea));
+                    migratedCount++;
+                }
+            }
+            
+            if (migratedCount > 0) {
+                await batch.commit();
+            }
             localStorage.removeItem(STORAGE_KEY);
-            showToast('Le tue idee locali sono state migrate nel cloud!', 'success');
+            if (migratedCount > 0) {
+                showToast('Le tue idee locali sono state migrate nel cloud!', 'success');
+            }
         }
 
         function ideaToFirestore(idea) {
