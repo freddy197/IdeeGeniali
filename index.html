@@ -1430,7 +1430,7 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-    <script src="firebase-config.js?v=3"></script>
+    <script src="firebase-config.js?v=5"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
@@ -2069,11 +2069,11 @@
                         <div class="comments-header">Soluzioni e commenti (${idea.comments.length})</div>
                         <div class="comments-list">${commentsHtml}</div>
                         <form class="comment-form" onsubmit="handleAddComment('${idea.id}', event)">
-                            <div class="row">
+                            <div class="row" style="flex-direction: column;">
                                 <input type="text" data-author placeholder="Il tuo nome" maxlength="40" required value="${escapeAttr(savedCommentAuthor)}" autocomplete="name">
-                                <input type="text" data-text placeholder="Proponi una soluzione, un contatto o un feedback…" maxlength="400" required autocomplete="off">
+                                <textarea data-text placeholder="Proponi una soluzione, un contatto o un feedback lungo quanto vuoi…" maxlength="12000" required></textarea>
                             </div>
-                            <button type="submit" class="btn-secondary" style="align-self:flex-start">Invia</button>
+                            <button type="submit" class="btn-secondary" style="align-self:flex-start; margin-top: 0.5rem;">Invia Commento</button>
                         </form>
                     </section>
                 `;
