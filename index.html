@@ -1431,7 +1431,7 @@
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-    <script src="firebase-config.js?v=6"></script>
+    <script src="firebase-config.js?v=7"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
@@ -1465,6 +1465,7 @@
         let categoryFilter = '';
         let sortMode = 'votes';
         let expandedIds = new Set(loadExpandedIds());
+        let expandedComments = new Set();
         let userVotes = loadUserVotes();
 
         const form = document.getElementById('add-idea-form');
@@ -1561,6 +1562,15 @@
                 expandedIds.add(id);
             }
             saveExpandedIds();
+            renderIdeas();
+        };
+
+        window.toggleReadComment = function(commentId) {
+            if (expandedComments.has(commentId)) {
+                expandedComments.delete(commentId);
+            } else {
+                expandedComments.add(commentId);
+            }
             renderIdeas();
         };
 
@@ -2026,17 +2036,24 @@
                 const savedCommentAuthor = localStorage.getItem(AUTHOR_KEY) || '';
 
                 const commentsHtml = idea.comments.length
-                    ? idea.comments.map(c => `
+                    ? idea.comments.map(c => {
+                        const isLongComment = isLongIdea(c.text);
+                        const isExpandedComment = expandedComments.has(c.id);
+                        const displayCommentText = isExpandedComment || !isLongComment ? c.text : truncateText(c.text, PREVIEW_CHARS, PREVIEW_LINES);
+                        return `
                         <div class="comment">
                             <div class="comment-author">${escapeHTML(c.author)}</div>
-                            <div class="comment-text">${escapeHTML(c.text)}</div>
+                            <div class="comment-text">${escapeHTML(displayCommentText)}</div>
+                            ${isLongComment && !isExpandedComment ? `<button type="button" class="read-toggle" onclick="toggleReadComment('${c.id}')" style="margin-top:0.25rem">Leggi tutto</button>` : ''}
+                            ${isLongComment && isExpandedComment ? `<button type="button" class="read-toggle" onclick="toggleReadComment('${c.id}')" style="margin-top:0.25rem">Mostra meno</button>` : ''}
                             <div class="comment-footer">
                                 <span class="timestamp">${formatTime(c.timestamp)}</span>
                                 <button type="button" class="delete-btn" onclick="handleDeleteComment('${idea.id}', '${c.id}')" title="Elimina commento">🗑️ Elimina</button>
                             </div>
                         </div>
-                    `).join('')
-                    : '<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.5rem">Nessun commento ancora — sii il primo a proporre una soluzione!</p>';
+                    `;
+                    }).join('')
+                    : '<div style="color:#94a3b8; font-size:0.9rem;">Nessun commento ancora. Sii il primo!</div>';
 
                 card.innerHTML = `
                     <div class="idea-top-row">
